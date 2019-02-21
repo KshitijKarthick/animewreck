@@ -1,0 +1,291 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title></title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+    <link href="https://cdn.jsdelivr.net/npm/jquery-flexdatalist@2.2.4/jquery.flexdatalist.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-flexdatalist@2.2.4/jquery.flexdatalist.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.9"></script>
+    <style>
+        html, body {
+            height: 100%;
+            background-color: #333;
+        }
+        body {
+            background-color: #333;
+            box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);
+            text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
+            color: #ffffff;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+        }
+        .title {
+            text-align: center !important;
+            width: 100%;
+        }
+        .watch-history {
+            margin: auto;
+            justify-content: center;
+        }
+        .movie-input {
+            margin-top: 2%;
+            margin-bottom: 2%;
+        }
+        .recommendation-button {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .flexdatalist-alias {
+            color: #000000 !important;
+        }
+        .headings {
+            margin: auto;
+        }
+        #recommendations-table {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='container title'>
+        <div class='row'>
+            <h1 class='headings'>Anime Recommendation Engine</h1>
+        </div>
+        <div class='row'>
+            <h5 class='description-message headings'></h5>
+        </div>
+    </div>
+    <div class='container watch-history' id='history-input'>
+        <form action='javascript:;' onsubmit='getRecommendations(this)'>
+            <div class='row movie-input form-group'>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Anime & Rating ( 0 - 10 )</span>
+                    </div>
+                    <input type='text'
+                    id='anime-1-id'
+                    placeholder='Write your anime name'
+                    class='flexdatalist'
+                    data-data='anime_list.json'
+                    data-search-in='title'
+                    data-min-length='1'
+                    data-selection-required='true'
+                    data-value-property='id'
+                    name='anime_suggestion'
+                    aria-label="First name"
+                    class="form-control is-valid"
+                    required>
+                    
+                    <input type="number"
+                    id='anime-1-rating'
+                    aria-label="Rating"
+                    class="form-control"
+                    min="0"
+                    max="10"
+                    required>
+                    
+                </div>
+            </div>
+            <div class='row movie-input form-group'>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Anime & Rating ( 0 - 10 )</span>
+                    </div>
+                    <input type='text'
+                    id='anime-2-id'
+                    placeholder='Write your anime name'
+                    class='flexdatalist'
+                    data-data='anime_list.json'
+                    data-search-in='title'
+                    data-min-length='1'
+                    data-selection-required='true'
+                    data-value-property='id'
+                    name='anime_suggestion'
+                    aria-label="First name"
+                    class="form-control"
+                    required>
+                    
+                    <input type="number"
+                    id='anime-2-rating'
+                    aria-label="Rating"
+                    class="form-control"
+                    min="0"
+                    max="10"
+                    required>
+                </div>
+            </div>
+            <div class='row movie-input form-group'>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Anime & Rating ( 0 - 10 )</span>
+                    </div>
+                    <input type='text'
+                    id='anime-3-id'
+                    placeholder='Write your anime name'
+                    class='flexdatalist'
+                    data-data='anime_list.json'
+                    data-search-in='title'
+                    data-min-length='1'
+                    data-selection-required='true'
+                    data-value-property='id'
+                    name='anime_suggestion'
+                    aria-label="First name"
+                    class="form-control"
+                    required>
+                    
+                    <input type="number"
+                    id='anime-3-rating'
+                    aria-label="Rating"
+                    class="form-control"
+                    min="0"
+                    max="10"
+                    required>
+                </div>
+            </div>
+            <div class='row movie-input form-group'>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Anime & Rating ( 0 - 10 )</span>
+                    </div>
+                    <input type='text'
+                    id='anime-4-id'
+                    placeholder='Write your anime name'
+                    class='flexdatalist'
+                    data-data='anime_list.json'
+                    data-search-in='title'
+                    data-min-length='1'
+                    data-selection-required='true'
+                    data-value-property='id'
+                    name='anime_suggestion'
+                    aria-label="First name"
+                    class="form-control"
+                    required>
+                    
+                    <input type="number"
+                    id='anime-4-rating'
+                    aria-label="Rating"
+                    class="form-control"
+                    min="0"
+                    max="10"
+                    required>
+                </div>
+            </div>
+            <div class='row movie-input form-group'>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Anime & Rating ( 0 - 10 )</span>
+                    </div>
+                    <input type='text'
+                    id='anime-5-id'
+                    placeholder='Write your anime name'
+                    class='flexdatalist'
+                    data-data='anime_list.json'
+                    data-search-in='title'
+                    data-min-length='1'
+                    data-selection-required='true'
+                    data-value-property='id'
+                    name='anime_suggestion'
+                    aria-label="First name"
+                    class="form-control"
+                    required>
+                    
+                    <input type="number"
+                    id='anime-5-rating'
+                    aria-label="Rating"
+                    class="form-control"
+                    min="0"
+                    max="10"
+                    required>
+                </div>
+            </div>
+            <div class='row movie-input form-group'>
+                <button type="submit"
+                class="recommendation-button btn btn-info mb-2">
+                Get Recommendations
+            </button>
+        </div>
+    </form>
+</div>
+<div class='container watch-history' id='recommendations-table'>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Anime</th>
+                <th scope="col">Ratings</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<script>
+    (function() {
+        $('.flexdatalist').flexdatalist({
+            minLength: 1,
+            selectionRequired: true,
+            searchIn: 'name',
+            valueProperty: 'id',
+            data: 'anime_list.json',
+            searchByWord: true,
+            searchContain: true,
+            selectionRequired: true
+        });
+    })();
+    
+    (function() {
+        var options = {
+            strings: [
+            "Enter your anime history with ratings.",
+            "See the magic !"
+            ],
+            typeSpeed: 80
+        }
+        var typed = new Typed(".description-message", options);
+    })();
+    
+    function getRecommendations(){
+        var recommendations_ele = $('#recommendations-table');
+        recommendations_ele.css('display', 'hidden')
+        var pastHistoryLength = 5;
+        var ratingIdTemplate = 'anime-{}-rating';
+        var animeIdTemplate = 'anime-{}-id';
+        var pastHistory = [];
+        for(var i=0; i<pastHistoryLength; i++) {
+            var animeId = parseInt($('#' + animeIdTemplate.replace('{}', i + 1)).val());
+            var rating = parseInt($('#' + ratingIdTemplate.replace('{}', i + 1)).val());
+            pastHistory.push({'id': animeId, 'rating': rating});
+        }
+        console.log(pastHistory);
+        $.ajax({
+            'url': '/recommendations',
+            'data': {'past_history': JSON.stringify(pastHistory)},
+            'type': 'GET'
+        }).done(function(result) {
+            var tbody = recommendations_ele.find('table tbody');
+            result.forEach(function(element, idx) {
+                var row = $('<tr>');
+                    $('<th>', {scope: 'row'}).text(idx + 1).appendTo(row);
+                        $('<td>').text(element['anime']).appendTo(row);
+                            $('<td>').text(element['rating']).appendTo(row);
+                                row.appendTo(tbody);
+                            });
+                            $('#history-input').css('display', 'none');
+                            recommendations_ele.css('display', 'block');
+                        }).fail(function(xhr, err) {
+                            console.log('Error raised', err);
+                        })
+                        return pastHistory;
+                    }
+                </script>
+            </body>
+            </html>
