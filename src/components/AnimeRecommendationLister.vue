@@ -15,10 +15,17 @@
           <template v-slot:items="props">
             <td class="text-xs-left">{{ props.item.title }}</td>
             <td class="text-xs-left">{{ props.item.rating }}</td>
-            <td class="justify-center layout px-0">
-              <v-icon class="mr-5" @click="toGraphExplorer(props.item.id)">
-                find_in_page
-              </v-icon>
+            <td class="text-xs-left">
+              <v-btn
+                flat
+                icon
+                :to="{
+                  name: 'anime',
+                  params: { targetAnimeId: props.item.id }
+                }"
+              >
+                <v-icon>find_in_page</v-icon>
+              </v-btn>
             </td>
           </template>
         </v-data-table>
@@ -40,14 +47,9 @@ export default {
     headers: [
       { text: "Anime", value: "title" },
       { text: "Rating", value: "rating" },
-      { text: "Anime Explorer" }
+      { text: "Anime Explorer", value: "" }
     ]
-  }),
-  methods: {
-    toGraphExplorer: function(index) {
-      this.$router.push({ name: "anime", params: { targetAnimeId: index } });
-    }
-  }
+  })
 };
 </script>
 <style></style>
