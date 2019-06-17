@@ -10,7 +10,7 @@ let store = {
     if (this.debug) console.log("setMessageAction triggered with", value);
     this.state[key] = value;
   },
-  clearMessageAction() {
+  clearMessageAction(key) {
     if (this.debug) console.log("clearMessageAction triggered");
     this.state[key] = undefined;
   }

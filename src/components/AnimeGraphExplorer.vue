@@ -6,7 +6,7 @@
 import * as THREE from "three";
 import SpriteText from "three-spritetext";
 import ForceGraph3D from "3d-force-graph";
-import store from "../store"
+import store from "../store";
 
 console.log(store);
 
@@ -40,7 +40,7 @@ export default {
     nodeClicked(node) {
       let animeId = node.id;
       this.$router.push({ name: "anime", params: { targetAnimeId: animeId } });
-      this.$router.go()
+      this.$router.go();
     },
     convertintoD3Data(pairwise) {
       let threshold = this.threshold;
@@ -55,8 +55,10 @@ export default {
       };
 
       function extractTitle(anime_id) {
-        let record = animeInfo[anime_id.toString()]
-        return record['title_english'] ? record['title_english'] : record['title']
+        let record = animeInfo[anime_id.toString()];
+        return record["title_english"]
+          ? record["title_english"]
+          : record["title"];
       }
 
       function normalize(min, max) {
@@ -82,9 +84,11 @@ export default {
           nodeLocation[record[0]] = data["nodes"].length - 1;
         }
         if (!(record[1] in nodeLocation)) {
-          data["nodes"].push(
-            { id: record[1], name: extractTitle(record[1]), group: 1 }
-          );
+          data["nodes"].push({
+            id: record[1],
+            name: extractTitle(record[1]),
+            group: 1
+          });
           nodeLocation[record[1]] = data["nodes"].length - 1;
         }
         data["links"].push({
@@ -147,20 +151,23 @@ export default {
   },
   watch: {
     animeMapping: function(newMapping) {
-      if(newMapping && newMapping.length > 0) {
-        if(!this.sharedState.animeInfo) {
-          this.eventBus.$on('anime-info-loaded', function() {
-            console.log('Building Graph Lazily')
-            let d3Data = this.convertintoD3Data(this.animeMapping);
-            this.buildGraph(d3Data);
-          }.bind(this))
+      if (newMapping && newMapping.length > 0) {
+        if (!this.sharedState.animeInfo) {
+          this.eventBus.$on(
+            "anime-info-loaded",
+            function() {
+              console.log("Building Graph Lazily");
+              let d3Data = this.convertintoD3Data(this.animeMapping);
+              this.buildGraph(d3Data);
+            }.bind(this)
+          );
         } else {
-          console.log('Building Graph')
+          console.log("Building Graph");
           let d3Data = this.convertintoD3Data(this.animeMapping);
           this.buildGraph(d3Data);
         }
       }
-    },
+    }
   },
   computed: {
     graphNode: function() {

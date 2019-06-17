@@ -47,9 +47,9 @@
 </template>
 
 <script>
-import axios from 'axios';
-import store from '../store';
-import * as R from 'ramda';
+import axios from "axios";
+import store from "../store";
+import * as R from "ramda";
 
 export default {
   name: "anime-watch-history-form",
@@ -81,12 +81,15 @@ export default {
     }
   },
   mounted() {
-    if(!this.sharedState.animeInfo) {
-      this.eventBus.$on('anime-info-loaded', function() {
-        console.log('Building Graph Lazily')
-        this.animeList.push(...Object.values(this.sharedState.animeInfo));
-        this.isLoading = false;
-      }.bind(this))
+    if (!this.sharedState.animeInfo) {
+      this.eventBus.$on(
+        "anime-info-loaded",
+        function() {
+          console.log("Building Graph Lazily");
+          this.animeList.push(...Object.values(this.sharedState.animeInfo));
+          this.isLoading = false;
+        }.bind(this)
+      );
     } else {
       this.animeList.push(...Object.values(this.sharedState.animeInfo));
       this.isLoading = false;

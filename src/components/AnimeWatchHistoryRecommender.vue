@@ -27,18 +27,16 @@
 </template>
 
 <script>
-import axios from 'axios';
-import * as R from 'ramda';
+import axios from "axios";
+import * as R from "ramda";
 import AnimeWatchHistoryLister from "./AnimeWatchHistoryLister";
 import AnimeWatchHistoryForm from "./AnimeWatchHistoryForm";
-import AnimeRecommendationLister from "./AnimeRecommendationLister";
 
 export default {
   name: "anime-watch-history-recommender",
   components: {
     AnimeWatchHistoryLister,
-    AnimeWatchHistoryForm,
-    AnimeRecommendationLister
+    AnimeWatchHistoryForm
   },
   data: () => ({
     pastHistoryLength: 5,
@@ -50,20 +48,25 @@ export default {
     },
     submitUserWatchHistory: function(index) {
       console.log("Submit", index);
-      let userWatchHistory = R.project(["id", "rating"])(this.userWatchHistory)
-      axios.get('http://localhost:9000/api/anime/recommendations', {
-        'params': {
-          'watch_history': JSON.stringify(userWatchHistory)
-        }
-      }).then(function (response){
-        let recommendations = response.data;
-        this.$router.push({
-          name: "recommendation",
-          params: { recommendationsJSON: JSON.stringify(recommendations) }
+      let userWatchHistory = R.project(["id", "rating"])(this.userWatchHistory);
+      axios
+        .get("http://localhost:9000/api/anime/recommendations", {
+          params: {
+            watch_history: JSON.stringify(userWatchHistory)
+          }
+        })
+        .then(
+          function(response) {
+            let recommendations = response.data;
+            this.$router.push({
+              name: "recommendation",
+              params: { recommendationsJSON: JSON.stringify(recommendations) }
+            });
+          }.bind(this)
+        )
+        .catch(function(error) {
+          console.log(error);
         });
-      }.bind(this)).catch(function (error){
-        console.log(error);
-      });
     }
   },
   computed: {
