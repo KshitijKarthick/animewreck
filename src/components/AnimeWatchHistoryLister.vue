@@ -42,10 +42,10 @@
               </template>
             </v-edit-dialog>
           </td>
-          <td>
-            <v-icon small class="mr-2" @click="removeAnimeRating(props.item)">
-              delete
-            </v-icon>
+          <td class="justify-center layout px-0">
+            <v-btn flat icon @click="removeAnimeRating(props.item)">
+              <v-icon small>delete</v-icon>
+            </v-btn>
           </td>
         </template>
       </v-data-table>

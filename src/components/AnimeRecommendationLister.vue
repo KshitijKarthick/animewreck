@@ -24,7 +24,7 @@
                   params: { targetAnimeId: props.item.id }
                 }"
               >
-                <v-icon>find_in_page</v-icon>
+                <v-icon>toys</v-icon>
               </v-btn>
             </td>
           </template>
