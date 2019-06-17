@@ -28,12 +28,12 @@
             min="1"
             max="10"
             required
+            @keydown.enter="addAnimeRating"
           >
           </v-text-field>
         </v-flex>
         <v-btn
           fab
-          @keydown.enter="addAnimeRating"
           @click="addAnimeRating"
           :disabled="!validForm"
           dark
