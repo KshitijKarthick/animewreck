@@ -15,12 +15,8 @@
           <template v-slot:items="props">
             <td class="text-xs-left">{{ props.item.title }}</td>
             <td class="text-xs-left">{{ props.item.rating }}</td>
-            <td>
-              <v-icon
-                small
-                class="mr-2"
-                @click="toGraphExplorer(props.item.id)"
-              >
+            <td class="justify-center layout px-0">
+              <v-icon class="mr-5" @click="toGraphExplorer(props.item.id)">
                 find_in_page
               </v-icon>
             </td>
@@ -43,7 +39,8 @@ export default {
   data: () => ({
     headers: [
       { text: "Anime", value: "title" },
-      { text: "Rating", value: "rating" }
+      { text: "Rating", value: "rating" },
+      { text: "Anime Explorer" }
     ]
   }),
   methods: {
