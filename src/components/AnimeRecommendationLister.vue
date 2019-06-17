@@ -1,36 +1,31 @@
 <template>
   <v-container>
     <v-layout column text-xs-center>
-      <v-flex mt-3 v-if="recommendations.length > 0">
+      <v-flex>
         <h2 class="display-1 font-weight-bold mb-3 align-center">
           Recommendation
         </h2>
       </v-flex>
       <v-flex>
-        <v-list>
-          <template>
-            <v-list-tile
-              v-for="(recommendation, index) in recommendations"
-              :key="index"
-            >
-              <v-list-tile-content>
-                <v-list-tile-title
-                  v-text="recommendation.title"
-                ></v-list-tile-title>
-              </v-list-tile-content>
-              <v-list-tile-content>
-                <v-list-tile-title
-                  v-text="recommendation.rating"
-                ></v-list-tile-title>
-              </v-list-tile-content>
-              <v-list-tile-action>
-                <v-btn @click="toGraphExplorer(recommendation.id)">
-                  <v-icon>find_in_page</v-icon>
-                </v-btn>
-              </v-list-tile-action>
-            </v-list-tile>
+        <v-data-table
+          :headers="headers"
+          :items="recommendations"
+          :rows-per-page-items="[10]"
+        >
+          <template v-slot:items="props">
+            <td class="text-xs-left">{{ props.item.title }}</td>
+            <td class="text-xs-left">{{ props.item.rating }}</td>
+            <td>
+              <v-icon
+                small
+                class="mr-2"
+                @click="toGraphExplorer(props.item.id)"
+              >
+                find_in_page
+              </v-icon>
+            </td>
           </template>
-        </v-list>
+        </v-data-table>
       </v-flex>
     </v-layout>
   </v-container>
@@ -45,6 +40,12 @@ export default {
       required: true
     }
   },
+  data: () => ({
+    headers: [
+      { text: "Anime", value: "title" },
+      { text: "Rating", value: "rating" }
+    ]
+  }),
   methods: {
     toGraphExplorer: function(index) {
       this.$router.push({ name: "anime", params: { targetAnimeId: index } });
