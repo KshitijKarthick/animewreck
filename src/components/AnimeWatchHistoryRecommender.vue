@@ -38,9 +38,14 @@ export default {
     AnimeWatchHistoryLister,
     AnimeWatchHistoryForm
   },
+  props: {
+    userWatchHistory: {
+      required: true,
+      type: Array
+    }
+  },
   data: () => ({
-    pastHistoryLength: 5,
-    userWatchHistory: []
+    pastHistoryLength: 5
   }),
   methods: {
     removeAnimeRating: function(index) {
@@ -67,6 +72,10 @@ export default {
         .catch(function(error) {
           console.log(error);
         });
+      this.$router.push({
+        name: "animeHistory",
+        params: { userWatchHistoryJSON: JSON.stringify(this.userWatchHistory) }
+      });
     }
   },
   computed: {

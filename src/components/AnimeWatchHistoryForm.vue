@@ -33,7 +33,7 @@
         </v-flex>
         <v-btn
           fab
-          @keyup.enter="addAnimeRating"
+          @keydown.enter="addAnimeRating"
           @click="addAnimeRating"
           :disabled="!validForm"
           dark
@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import store from "../store";
 import * as R from "ramda";
 
