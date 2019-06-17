@@ -48,7 +48,6 @@
 
 <script>
 import store from "../store";
-import * as R from "ramda";
 
 export default {
   name: "anime-watch-history-form",
@@ -68,7 +67,6 @@ export default {
   }),
   methods: {
     addAnimeRating: function() {
-      console.log("Clicked");
       this.userWatchHistory.push({
         id: parseInt(this.inputAnime.id),
         title: this.inputAnime.title,
@@ -76,7 +74,6 @@ export default {
       });
       this.inputRating = null;
       this.inputAnime = null;
-      console.log("clicked");
     }
   },
   mounted() {
@@ -84,7 +81,6 @@ export default {
       this.eventBus.$on(
         "anime-info-loaded",
         function() {
-          console.log("Building Graph Lazily");
           this.animeList.push(...Object.values(this.sharedState.animeInfo));
           this.isLoading = false;
         }.bind(this)
@@ -96,16 +92,14 @@ export default {
   },
   computed: {
     items: function() {
-      let japanese_titles = R.project(["id", "title"])(this.animeList);
-      let english_titles = R.compose(
-        R.filter(anime => {
-          return anime["title"] != null;
-        }),
-        R.map(anime => {
-          return { id: anime["id"], title: anime["title_english"] };
-        })
-      )(this.animeList);
-      return japanese_titles.concat(english_titles);
+      let titles = [];
+      this.animeList.forEach(function(record) {
+        if (record["title_english"]) {
+          titles.push({ id: record["id"], title: record["title_english"] });
+        }
+        titles.push({ id: record["id"], title: record["title"] });
+      });
+      return titles;
     },
     validForm: function() {
       let validRating =
