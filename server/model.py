@@ -27,6 +27,13 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 anime_df = pd.read_feather('model_resources/animes.feather').set_index('anime_monotonic_id')
 anime_embeddings = torch.from_numpy(torch.load('model_resources/anime_embeddings.torch'))
 
+sliced_user_grouped_rating_file = 'model_resources/ordered_sliced_user_grouped_rating_len5_rep3_small.pkl'
+grouped_rating_df = pd.read_pickle(sliced_user_grouped_rating_file)
+shuffled_ratings_genre_df = grouped_rating_df.sample(frac=1)
+msk = np.random.rand(len(shuffled_ratings_genre_df)) < 0.8
+train_df = shuffled_ratings_genre_df[msk]
+test_df = shuffled_ratings_genre_df[~msk]
+
 
 class AnimeRatingsDataset(Dataset):
     """Custom Dataset for loading entries from HDF5 databases"""
@@ -69,6 +76,15 @@ class AnimeRatingsDataset(Dataset):
 
     def __len__(self):
         return self.x.shape[0]
+
+
+databunch = DataBunch.create(
+    train_ds=AnimeRatingsDataset(train_df),
+    valid_ds=AnimeRatingsDataset(test_df),
+    device=device,
+    bs=batch_size,
+    num_workers=0
+)
 
 
 class Net(nn.Module):
@@ -190,6 +206,8 @@ model = Net(
     bidirectional=True
 )
 model.to(device)
+learn = Learner(data=databunch, model=model, loss_func=nn.MSELoss())
+learn = learn.load('lstm_learner_len5_3rep_{}cyc_{}-{}'.format(8, 1.81, 1.798))
 
 def sort_by_distance(record, anime_monotonic_id_embeddings, reverse=True):
     target_embedding = anime_monotonic_id_embeddings[record['target_anime_monotonic_id']]
@@ -280,6 +298,6 @@ def recommendation(
 generate_recommendations = partial(
     recommendation,
     anime_df=anime_df,
-    model=model,
+    model=learn.model,
     only_similar=True
 )
