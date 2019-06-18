@@ -54,6 +54,41 @@ export default {
         links: []
       };
 
+      function genreGroupEncoder(animeId) {
+        let genreMapping = [
+          "action",
+          "adventure",
+          "psychological",
+          "slice of life",
+          "sports",
+          "comedy",
+          "shounen",
+          "horror",
+          "romance",
+          "drama",
+          "thriller",
+          "mystery",
+          "fantasy",
+          "sci-fi",
+          "historical",
+          "ecchi",
+          "harem",
+          "hentai"
+        ];
+        let currentGenreList = new Set(
+          animeInfo[animeId]["genre"]
+            .split(", ")
+            .map(word => word.toLowerCase())
+        );
+        for (let i = 0; i < genreMapping.length; i++) {
+          let genre = genreMapping[i];
+          if (currentGenreList.has(genre)) {
+            return i + 1;
+          }
+        }
+        return genreMapping.length + 1;
+      }
+
       function extractTitle(anime_id) {
         let record = animeInfo[anime_id.toString()];
         return record["title_english"]
@@ -79,7 +114,7 @@ export default {
           data["nodes"].push({
             id: record[0],
             name: extractTitle(record[0]),
-            group: parseInt(Math.random() * 10)
+            group: genreGroupEncoder(record[0])
           });
           nodeLocation[record[0]] = data["nodes"].length - 1;
         }
@@ -87,7 +122,7 @@ export default {
           data["nodes"].push({
             id: record[1],
             name: extractTitle(record[1]),
-            group: 1
+            group: genreGroupEncoder(record[1])
           });
           nodeLocation[record[1]] = data["nodes"].length - 1;
         }
