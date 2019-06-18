@@ -11,6 +11,7 @@
           :headers="headers"
           :items="recommendations"
           :rows-per-page-items="[10]"
+          :pagination.sync="pagination"
         >
           <template v-slot:items="props">
             <td class="text-xs-left">{{ props.item.title }}</td>
@@ -48,7 +49,11 @@ export default {
       { text: "Anime", value: "title" },
       { text: "Rating", value: "rating" },
       { text: "Anime Explorer", value: "" }
-    ]
+    ],
+    pagination: {
+      sortBy: "rating",
+      descending: true
+    }
   })
 };
 </script>
