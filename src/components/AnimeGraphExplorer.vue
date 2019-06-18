@@ -213,7 +213,7 @@ export default {
       while (myNode.firstChild) {
         myNode.removeChild(myNode.firstChild);
       }
-      return ForceGraph3D();
+      return ForceGraph3D({ controlType: "trackball" });
     },
     height: function() {
       return this.graphNode.parentNode.clientHeight * 0.91;
