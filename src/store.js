@@ -16,7 +16,22 @@ let store = {
   }
 };
 
-axios.get("http://localhost:9000/api/anime/titles").then(function(response) {
+store.setData("serverRoutesConfig", {
+  base: "http://localhost:9000",
+  neighbors: "/api/anime/neighbors",
+  recommendations: "/api/anime/recommendations",
+  titles: "/api/anime/titles"
+});
+
+store.setData("serverRoutes", function(key) {
+  let apiUrl = store.state.serverRoutesConfig[key].replace(/\/$/, "");
+  let baseUrl = store.state.serverRoutesConfig["base"].replace(/\/$/, "");
+  let serverUrl = baseUrl + apiUrl;
+  console.log(serverUrl);
+  return serverUrl;
+});
+
+axios.get(store.state.serverRoutes("titles")).then(function(response) {
   store.setData("animeInfo", response.data);
   store.eventBus.$emit("anime-info-loaded");
 });

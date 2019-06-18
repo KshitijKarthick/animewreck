@@ -6,6 +6,7 @@
 <script>
 import AnimeGraphExplorer from "../components/AnimeGraphExplorer";
 import axios from "axios";
+import store from "../store";
 
 export default {
   props: {
@@ -23,12 +24,15 @@ export default {
   },
   mounted() {
     axios
-      .get("http://localhost:9000/api/anime/neighbors/" + this.targetAnimeId)
+      .get(
+        this.sharedState.serverRoutes("neighbors") + "/" + this.targetAnimeId
+      )
       .then(response => (this.animeMapping = response.data));
   },
   data: function() {
     return {
-      animeMapping: []
+      animeMapping: [],
+      sharedState: store.state
     };
   }
 };

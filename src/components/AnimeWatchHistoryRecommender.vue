@@ -31,6 +31,7 @@ import axios from "axios";
 import * as R from "ramda";
 import AnimeWatchHistoryLister from "./AnimeWatchHistoryLister";
 import AnimeWatchHistoryForm from "./AnimeWatchHistoryForm";
+import store from "../store";
 
 export default {
   name: "anime-watch-history-recommender",
@@ -45,7 +46,8 @@ export default {
     }
   },
   data: () => ({
-    pastHistoryLength: 5
+    pastHistoryLength: 5,
+    sharedState: store.state
   }),
   methods: {
     removeAnimeRating: function(index) {
@@ -55,7 +57,7 @@ export default {
       console.log("Submit", index);
       let userWatchHistory = R.project(["id", "rating"])(this.userWatchHistory);
       axios
-        .get("http://localhost:9000/api/anime/recommendations", {
+        .get(this.sharedState.serverRoutes("recommendations"), {
           params: {
             watch_history: JSON.stringify(userWatchHistory)
           }
