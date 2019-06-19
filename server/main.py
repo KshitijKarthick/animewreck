@@ -47,13 +47,14 @@ def render_homepage(anime_id: int):
     return PAIRWISE_MAPPING[str(anime_id)]
 
 @app.get("/api/anime/recommendations")
-def recommendations(watch_history, topn=50):
+def recommendations(watch_history, specificity:int=50, topn:int=50):
     watch_history = json.loads(watch_history)
-    print(watch_history)
+    print(watch_history, specificity, topn)
     result = generate_recommendations(
         previous_watch_history=[int(_['id']) for _ in watch_history][:5],
         previous_watch_ratings=[int(_['rating']) for _ in watch_history][:5],
-        topn=topn
+        topn=topn,
+        topn_similar=specificity
     )
     print(result[['title', 'recommendation_rating']])
     return result.reset_index()[['title', 'recommendation_rating', 'target_anime_monotonic_id']].rename(
