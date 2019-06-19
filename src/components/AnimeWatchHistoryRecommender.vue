@@ -13,7 +13,7 @@
         :pastHistoryLength="pastHistoryLength"
       >
       </AnimeWatchHistoryLister>
-      <v-flex mt-2>
+      <v-flex mt-1>
         <v-btn
           color="success"
           v-if="userWatchHistory.length == pastHistoryLength"
@@ -21,6 +21,27 @@
         >
           Submit
         </v-btn>
+      </v-flex>
+      <v-flex>
+        <template v-if="userWatchHistory.length == pastHistoryLength">
+          <v-card flat color="transparent">
+            <v-card-text class=".v-card-text">
+              <v-slider
+                class="slider-hint"
+                v-model="specificity"
+                step="5"
+                :min="minSpecificity"
+                :max="maxSpecificity"
+                thumb-label
+                :hint="sliderHint"
+                ticks
+                :label="specificityLabel"
+                :inverse-label="true"
+                :persistent-hint="true"
+              ></v-slider>
+            </v-card-text>
+          </v-card>
+        </template>
       </v-flex>
     </v-layout>
   </v-container>
@@ -43,11 +64,19 @@ export default {
     userWatchHistory: {
       required: true,
       type: Array
+    },
+    specificity: {
+      required: true,
+      type: Number
     }
   },
   data: () => ({
     pastHistoryLength: 5,
-    sharedState: store.state
+    sharedState: store.state,
+    minSpecificity: 3,
+    maxSpecificity: 100,
+    specificityLabel: "Generality",
+    sliderHint: "[ More Left ] Specificity vs Generality [ More Right ]"
   }),
   methods: {
     removeAnimeRating: function(index) {
@@ -59,7 +88,8 @@ export default {
       axios
         .get(this.sharedState.serverRoutes("recommendations"), {
           params: {
-            watch_history: JSON.stringify(userWatchHistory)
+            watch_history: JSON.stringify(userWatchHistory),
+            specificity: this.specificity
           }
         })
         .then(
@@ -76,7 +106,10 @@ export default {
         });
       this.$router.push({
         name: "animeHistory",
-        params: { userWatchHistoryJSON: JSON.stringify(this.userWatchHistory) }
+        params: {
+          userWatchHistoryJSON: JSON.stringify(this.userWatchHistory),
+          specificity: this.specificity
+        }
       });
     }
   },
@@ -90,4 +123,12 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.slider-hint {
+  text-align: center;
+}
+
+.v-card-text {
+  padding-top: 0;
+}
+</style>

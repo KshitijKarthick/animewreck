@@ -1,5 +1,8 @@
 <template>
-  <AnimeWatchHistoryRecommender :userWatchHistory="userWatchHistory">
+  <AnimeWatchHistoryRecommender
+    :userWatchHistory="userWatchHistory"
+    :specificity="specificity"
+  >
   </AnimeWatchHistoryRecommender>
 </template>
 
@@ -11,6 +14,10 @@ export default {
     userWatchHistoryJSON: {
       default: null,
       type: String
+    },
+    specificity: {
+      default: 50,
+      type: Number
     }
   },
   data: () => ({

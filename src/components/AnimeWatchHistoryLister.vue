@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-flex mt-3 v-if="userWatchHistory.length > 0">
+    <v-flex v-if="userWatchHistory.length > 0">
       <h2 class="headline mb-3">Past History</h2>
     </v-flex>
     <v-flex>

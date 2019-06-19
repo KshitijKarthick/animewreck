@@ -67,13 +67,15 @@ export default {
   }),
   methods: {
     addAnimeRating: function() {
-      this.userWatchHistory.push({
-        id: parseInt(this.inputAnime.id),
-        title: this.inputAnime.title,
-        rating: parseFloat(this.inputRating)
-      });
-      this.inputRating = null;
-      this.inputAnime = null;
+      if (this.validForm) {
+        this.userWatchHistory.push({
+          id: parseInt(this.inputAnime.id),
+          title: this.inputAnime.title,
+          rating: parseFloat(this.inputRating)
+        });
+        this.inputRating = null;
+        this.inputAnime = null;
+      }
     }
   },
   mounted() {
