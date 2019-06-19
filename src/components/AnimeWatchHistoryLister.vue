@@ -4,6 +4,7 @@
       <v-data-table
         :headers="headers"
         :items="userWatchHistory"
+        :disable-initial-sort="true"
         v-if="userWatchHistory.length > 0"
       >
         <template v-slot:items="props">
@@ -79,8 +80,13 @@ export default {
     }
   }),
   methods: {
-    removeAnimeRating: function(index) {
-      this.userWatchHistory.splice(index, 1);
+    removeAnimeRating: function(record) {
+      for (let i = 0; i < this.userWatchHistory.length; i++) {
+        let currentRecord = this.userWatchHistory[i];
+        if (record.id === currentRecord.id) {
+          return this.userWatchHistory.splice(i, 1);
+        }
+      }
     },
     saveEditBox(value) {
       console.log(value);
