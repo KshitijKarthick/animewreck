@@ -16,7 +16,7 @@ export default new Router({
       component: Home
     },
     {
-      path: "/anime/history/:userWatchHistoryJSON/:specificity",
+      path: "/anime/history/:userWatchHistoryJSON",
       name: "animeHistory",
       component: Home,
       props: true

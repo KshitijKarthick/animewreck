@@ -8,6 +8,7 @@
       </v-flex>
       <v-flex>
         <v-data-table
+          :loading="isLoading"
           :headers="headers"
           :items="recommendations"
           :rows-per-page-items="[10]"
@@ -16,6 +17,9 @@
           <template v-slot:items="props">
             <td class="text-xs-left">{{ props.item.title }}</td>
             <td class="text-xs-left">{{ props.item.rating }}</td>
+            <td v-if="inference" class="text-xs-left">
+              {{ props.item.inference_source_title }}
+            </td>
             <td class="text-xs-left">
               <v-btn
                 flat
@@ -36,6 +40,7 @@
 </template>
 
 <script>
+import store from "../store";
 export default {
   name: "anime-recommendation-lister",
   props: {
@@ -45,16 +50,68 @@ export default {
     }
   },
   data: () => ({
-    headers: [
-      { text: "Anime", value: "title" },
-      { text: "Rating", value: "rating" },
-      { text: "Anime Explorer", value: "" }
-    ],
+    sharedState: store.state,
+    eventBus: store.eventBus,
     pagination: {
       sortBy: "rating",
       descending: true
+    },
+    isLoading: true,
+    inference: true
+  }),
+  mounted() {
+    function buildRecommendationTitle() {
+      let animeInfo = this.sharedState.animeInfo;
+
+      function extractTitle(anime_id) {
+        let record = animeInfo[anime_id.toString()];
+        return record["title_english"]
+          ? record["title_english"]
+          : record["title"];
+      }
+
+      this.recommendations.forEach(
+        function(record) {
+          record["title"] = extractTitle(record["id"]);
+          if (this.inference) {
+            record["inference_source_title"] = record[
+              "inference_source_ids"
+            ].map(extractTitle);
+          }
+        }.bind(this)
+      );
+      this.isLoading = false;
     }
-  })
+
+    if (!this.sharedState.animeInfo) {
+      this.eventBus.$on(
+        "anime-info-loaded",
+        function() {
+          buildRecommendationTitle.bind(this)();
+        }.bind(this)
+      );
+    } else {
+      buildRecommendationTitle.bind(this)();
+    }
+  },
+  computed: {
+    headers: function() {
+      if (this.inference === true) {
+        return [
+          { text: "Anime", value: "title" },
+          { text: "Rating", value: "rating" },
+          { text: "Inference Source", value: "inference_source_title" },
+          { text: "Anime Explorer", value: "" }
+        ];
+      } else {
+        return [
+          { text: "Anime", value: "title" },
+          { text: "Rating", value: "rating" },
+          { text: "Anime Explorer", value: "" }
+        ];
+      }
+    }
+  }
 };
 </script>
 <style></style>

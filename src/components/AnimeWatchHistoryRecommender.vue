@@ -95,6 +95,15 @@ export default {
         .then(
           function(response) {
             let recommendations = response.data;
+            for (let i = 0; i < recommendations.length; i++) {
+              let data = recommendations[i];
+              if (data.inference_source_title) {
+                // debugger;
+                data.inference_source_title = encodeURIComponent(
+                  data.inference_source_title.join(", ")
+                );
+              }
+            }
             this.$router.push({
               name: "recommendation",
               params: { recommendationsJSON: JSON.stringify(recommendations) }
