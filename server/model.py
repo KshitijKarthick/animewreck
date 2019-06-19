@@ -223,27 +223,35 @@ def sort_by_distance(record, anime_monotonic_id_embeddings, reverse=True):
     record['input_status'] = record['input_status'][sorted_mask]
     return record
 
-def get_similar_anime_from_watch_history(previous_watch_history, anime_embeddings, topn=50):
+def get_similar_anime_from_watch_history(previous_watch_history, anime_embeddings,
+                                         inference=False, topn=50):
+    neighbours_inference = None
     watched_animes = previous_watch_history
     not_watched_animes = list(set(anime_df.index).difference(set(watched_animes)))
-    return list(itertools.chain(*[
-        sorted([
-            (not_watched, cosine(anime_embeddings[not_watched], anime_embeddings[watched])) 
-            for not_watched in not_watched_animes
-        ], key=lambda x: x[1])[:topn]
-        for watched in watched_animes
-    ]))
+
+    top_similar_not_watched_animes = [sorted([
+        (not_watched, cosine(anime_embeddings[not_watched], anime_embeddings[watched])) 
+        for not_watched in not_watched_animes
+    ], key=lambda x: x[1])[:topn] for watched in watched_animes]
+    if inference:
+        neighbours_inference = dict(zip(watched_animes, [
+            [_[0] for _ in anime] for anime in top_similar_not_watched_animes]))
+    return list(itertools.chain(*top_similar_not_watched_animes)), neighbours_inference
         
 
 def recommendation(
     previous_watch_history, previous_watch_ratings, anime_df, model,
-    topn=50, only_similar=False, topn_similar=50
+    topn=50, only_similar=False, topn_similar=50,
+    inference=False
 ):
+    neighbours_inference = None
     watched_animes = previous_watch_history
     if only_similar:
-        not_watched_animes, scores = zip(*get_similar_anime_from_watch_history(
-            previous_watch_history, anime_embeddings, topn_similar
-        ))
+        not_watched_similarity_scores, neighbours_inference = get_similar_anime_from_watch_history(
+            previous_watch_history, anime_embeddings, topn=topn_similar,
+            inference=inference
+        )
+        (not_watched_animes, scores) = zip(*not_watched_similarity_scores)
         not_watched_animes = set(not_watched_animes)
     else:
         not_watched_animes = list(set(anime_df.index).difference(set(watched_animes)))
@@ -278,14 +286,40 @@ def recommendation(
         [user_personalised_predict_df.reset_index(), recommended_ratings_df], axis=1
     ).sort_values(by=['recommendation_rating'], ascending=False).iloc[:topn]
 
-    return pd.merge(
+    result_df = pd.merge(
         user_personalised_predict_df,
         anime_df.reset_index()[['anime_monotonic_id', 'title', 'title_english']].rename(
             columns={'anime_monotonic_id': 'target_anime_monotonic_id'}
         ),
         on='target_anime_monotonic_id',
         how='inner'
-    ).set_index('target_anime_monotonic_id')
+    )
+
+    if inference:
+        inference_df = pd.merge(
+            pd.DataFrame([
+                {'input_anime_monotonic_id': watched, 'target_anime_monotonic_id': not_watched}
+                for watched, not_watched_list in neighbours_inference.items()
+                for not_watched in not_watched_list
+            ]),
+            anime_df.reset_index()[['anime_monotonic_id', 'title', 'title_english']].rename(
+                columns={'anime_monotonic_id': 'input_anime_monotonic_id'}
+            ),
+            on='input_anime_monotonic_id',
+            how='left'
+        ).groupby('target_anime_monotonic_id').agg(list).reset_index()
+        result_df = pd.merge(
+            result_df,
+            inference_df.rename(columns={
+                'input_anime_monotonic_id': 'inference_source',
+                'title': 'inference_source_title',
+                'title_english': 'inference_source_title_english'
+            }),
+            on='target_anime_monotonic_id',
+            how='inner'
+        )
+
+    return result_df.set_index('target_anime_monotonic_id')
 
 
 # recommendation(
@@ -299,5 +333,5 @@ generate_recommendations = partial(
     recommendation,
     anime_df=anime_df,
     model=learn.model,
-    only_similar=True
+    only_similar=True,
 )

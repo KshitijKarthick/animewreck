@@ -47,20 +47,25 @@ def render_homepage(anime_id: int):
     return PAIRWISE_MAPPING[str(anime_id)]
 
 @app.get("/api/anime/recommendations")
-def recommendations(watch_history, specificity:int=50, topn:int=50):
+def recommendations(watch_history, specificity:int=50, topn:int=50, inference:bool=True):
     watch_history = json.loads(watch_history)
     print(watch_history, specificity, topn)
+    columns_interested = ['recommendation_rating', 'target_anime_monotonic_id']
     result = generate_recommendations(
         previous_watch_history=[int(_['id']) for _ in watch_history][:5],
         previous_watch_ratings=[int(_['rating']) for _ in watch_history][:5],
         topn=topn,
-        topn_similar=specificity
-    )
-    print(result[['title', 'recommendation_rating']])
-    return result.reset_index()[['title', 'recommendation_rating', 'target_anime_monotonic_id']].rename(
+        topn_similar=specificity,
+        inference=inference
+    ).reset_index()
+    if inference:
+        columns_interested.extend(['inference_source'])
+    print(result[columns_interested])
+    return result.reset_index()[columns_interested].rename(
         columns={
             'recommendation_rating': 'rating',
-            'target_anime_monotonic_id': 'id'
+            'target_anime_monotonic_id': 'id',
+            'inference_source': 'inference_source_ids'
         }).to_dict(orient='record')
 
 logging.info('All application resources are loaded')
