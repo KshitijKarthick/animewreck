@@ -1,8 +1,5 @@
 <template>
   <div>
-    <v-flex v-if="userWatchHistory.length > 0">
-      <h2 class="headline mb-3">Past History</h2>
-    </v-flex>
     <v-flex>
       <v-data-table
         :headers="headers"

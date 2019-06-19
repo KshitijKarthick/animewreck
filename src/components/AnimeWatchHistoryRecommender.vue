@@ -13,7 +13,7 @@
         :pastHistoryLength="pastHistoryLength"
       >
       </AnimeWatchHistoryLister>
-      <v-flex mt-1>
+      <v-flex mt-3>
         <v-btn
           color="success"
           v-if="userWatchHistory.length == pastHistoryLength"
@@ -25,7 +25,7 @@
       <v-flex>
         <template v-if="userWatchHistory.length == pastHistoryLength">
           <v-card flat color="transparent">
-            <v-card-text class=".v-card-text">
+            <v-card-text class="v-card-text">
               <v-slider
                 class="slider-hint"
                 v-model="specificity"
@@ -129,6 +129,6 @@ export default {
 }
 
 .v-card-text {
-  padding-top: 0;
+  padding-top: 0 !important;
 }
 </style>
