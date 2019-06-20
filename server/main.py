@@ -47,7 +47,8 @@ def render_homepage(anime_id: int):
     return PAIRWISE_MAPPING[str(anime_id)]
 
 @app.get("/api/anime/recommendations")
-def recommendations(watch_history, specificity:int=50, topn:int=50, inference:bool=True):
+def recommendations(watch_history, specificity:int=50, genre_similarity:bool=False,
+                    topn:int=50, inference:bool=True):
     watch_history = json.loads(watch_history)
     print(watch_history, specificity, topn)
     columns_interested = ['recommendation_rating', 'target_anime_monotonic_id']
@@ -56,7 +57,8 @@ def recommendations(watch_history, specificity:int=50, topn:int=50, inference:bo
         previous_watch_ratings=[int(_['rating']) for _ in watch_history][:5],
         topn=topn,
         topn_similar=specificity,
-        inference=inference
+        inference=inference,
+        genre_similarity=genre_similarity
     ).reset_index()
     if inference:
         columns_interested.extend(['inference_source'])
