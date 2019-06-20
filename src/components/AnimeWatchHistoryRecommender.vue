@@ -13,15 +13,24 @@
         :pastHistoryLength="pastHistoryLength"
       >
       </AnimeWatchHistoryLister>
-      <v-flex mt-3>
-        <v-btn
-          color="success"
-          v-if="userWatchHistory.length == pastHistoryLength"
-          @click="submitUserWatchHistory"
-        >
-          Submit
-        </v-btn>
-      </v-flex>
+      <v-layout
+        align-center
+        justify-center
+        row
+        v-if="userWatchHistory.length == pastHistoryLength"
+      >
+        <v-flex mt-3>
+          <v-btn color="success" @click="submitUserWatchHistory">
+            Submit
+          </v-btn>
+        </v-flex>
+        <v-flex mt-3 xs2>
+          <v-checkbox
+            v-model="genreSpecific"
+            label="Only Similar Genres"
+          ></v-checkbox>
+        </v-flex>
+      </v-layout>
       <v-flex>
         <template v-if="userWatchHistory.length == pastHistoryLength">
           <v-card flat color="transparent">
@@ -71,6 +80,7 @@ export default {
     }
   },
   data: () => ({
+    genreSpecific: true,
     pastHistoryLength: 5,
     sharedState: store.state,
     minSpecificity: 3,
@@ -89,7 +99,8 @@ export default {
         .get(this.sharedState.serverRoutes("recommendations"), {
           params: {
             watch_history: JSON.stringify(userWatchHistory),
-            specificity: this.specificity
+            specificity: this.specificity,
+            genre_similarity: this.genreSpecific
           }
         })
         .then(
@@ -98,7 +109,6 @@ export default {
             for (let i = 0; i < recommendations.length; i++) {
               let data = recommendations[i];
               if (data.inference_source_title) {
-                // debugger;
                 data.inference_source_title = encodeURIComponent(
                   data.inference_source_title.join(", ")
                 );
