@@ -37,22 +37,23 @@ test_df = shuffled_ratings_genre_df[~msk]
 anime_df = pd.read_feather('model_resources/animes.feather').set_index('anime_monotonic_id')
 anime_embeddings = torch.from_numpy(torch.load('model_resources/anime_embeddings.torch'))
 
-from sklearn.preprocessing import MultiLabelBinarizer
-anime_genres_df = anime_df.copy()[['genre']]
-anime_genres_df['genre_split'] = anime_genres_df['genre'].str.split(',').apply(lambda x: [_.strip() for _ in x] if x else [])
-mb = MultiLabelBinarizer()
-genres_encoded = mb.fit_transform(anime_genres_df['genre_split'].values)
+# from sklearn.preprocessing import MultiLabelBinarizer
+# anime_genres_df = anime_df.copy()[['genre']]
+# anime_genres_df['genre_split'] = anime_genres_df['genre'].str.split(',').apply(lambda x: [_.strip() for _ in x] if x else [])
+# mb = MultiLabelBinarizer()
+# genres_encoded = mb.fit_transform(anime_genres_df['genre_split'].values)
 
-mapped_genres = np.apply_along_axis(lambda x: np.ma.masked_array(
-    np.arange(len(mb.classes_)),
-    mask=np.logical_not(x),
-    fill_value=len(mb.classes_)).filled(), axis=1, arr=genres_encoded)
+# mapped_genres = np.apply_along_axis(lambda x: np.ma.masked_array(
+#     np.arange(len(mb.classes_)),
+#     mask=np.logical_not(x),
+#     fill_value=len(mb.classes_)).filled(), axis=1, arr=genres_encoded)
 
-anime_genres_df['genre_encoded'] = pd.DataFrame(mapped_genres).values.tolist()
+# anime_genres_df['genre_encoded'] = pd.DataFrame(mapped_genres).values.tolist()
 
-anime_genres_enc_df = anime_genres_df.reset_index().rename(
-    columns={'index': 'anime_monotonic_id'})[['anime_monotonic_id', 'genre_encoded']].set_index('anime_monotonic_id')
-genre_embedding_wts = torch.load('model_resources/genre_embeddings.torch')
+# anime_genres_enc_df = anime_genres_df.reset_index().rename(
+#     columns={'index': 'anime_monotonic_id'})[['anime_monotonic_id', 'genre_encoded']].set_index('anime_monotonic_id')
+# genre_embedding_wts = torch.load('model_resources/genre_embeddings.torch')
+anime_with_genre_embeddings = torch.load('model_resources/anime_with_genre_embeddings.wts')
 
 
 class AnimeRatingsDataset(Dataset):
@@ -259,24 +260,24 @@ def get_similar_anime_from_watch_history(previous_watch_history, anime_embedding
     return list(itertools.chain(*top_similar_not_watched_animes)), neighbours_inference
 
 
-def get_genre_embeddings(genre_embeddings_wts):
-    emb_layer = torch.nn.Embedding.from_pretrained(genre_embeddings_wts)
-    genre_zeros_mask = torch.zeros(genre_embedding_size).to(device)
-    genre_ones_mask = torch.ones(genre_embedding_size).to(device)
-    batch_genres = torch.from_numpy(np.array(anime_genres_enc_df['genre_encoded'].tolist()))
-    genre_embeddings = emb_layer(batch_genres)
-    mask = torch.where(
-        batch_genres.view(-1, num_genres - 1, 1) == num_genres - 1,
-        genre_zeros_mask,
-        genre_ones_mask
-    ).view(-1, num_genres - 1, genre_embedding_size)
-    masked_genre_embeddings = torch.mul(mask, genre_embeddings)
-    sum_genre_embeddings = torch.sum(masked_genre_embeddings, dim=1)
-    #anime embeddings is 6669, this is 6668. We need 0th as empty as it is not used with iloc
-    return np.concatenate([
-        np.zeros((1, genre_embedding_size)),
-        sum_genre_embeddings.cpu().detach().numpy()
-    ])
+# def get_genre_embeddings(genre_embeddings_wts):
+#     emb_layer = torch.nn.Embedding.from_pretrained(genre_embeddings_wts)
+#     genre_zeros_mask = torch.zeros(genre_embedding_size).to(device)
+#     genre_ones_mask = torch.ones(genre_embedding_size).to(device)
+#     batch_genres = torch.from_numpy(np.array(anime_genres_enc_df['genre_encoded'].tolist()))
+#     genre_embeddings = emb_layer(batch_genres)
+#     mask = torch.where(
+#         batch_genres.view(-1, num_genres - 1, 1) == num_genres - 1,
+#         genre_zeros_mask,
+#         genre_ones_mask
+#     ).view(-1, num_genres - 1, genre_embedding_size)
+#     masked_genre_embeddings = torch.mul(mask, genre_embeddings)
+#     sum_genre_embeddings = torch.sum(masked_genre_embeddings, dim=1)
+#     #anime embeddings is 6669, this is 6668. We need 0th as empty as it is not used with iloc
+#     return np.concatenate([
+#         np.zeros((1, genre_embedding_size)),
+#         sum_genre_embeddings.cpu().detach().numpy()
+#     ])
         
 
 def recommendation(
@@ -287,10 +288,13 @@ def recommendation(
     neighbours_inference = None
     watched_animes = previous_watch_history
     if only_similar:
-        similarity_embeddings = anime_embeddings
+        # similarity_embeddings = anime_embeddings
+        similarity_embeddings = anime_with_genre_embeddings['anime_embeddings']
         if genre_similarity:
-            genre_embeddings = get_genre_embeddings(genre_embedding_wts)
-            similarity_embeddings = np.concatenate([anime_embeddings, genre_embeddings], axis=1)
+            similarity_embeddings = anime_with_genre_embeddings['anime_with_genre_embeddings']
+            # genre_embeddings = get_genre_embeddings(genre_embedding_wts)
+            # similarity_embeddings = np.concatenate([anime_embeddings, genre_embeddings], axis=1)
+        print("Similarity Embedding size", similarity_embeddings.shape)
         not_watched_similarity_scores, neighbours_inference = get_similar_anime_from_watch_history(
             previous_watch_history, similarity_embeddings, topn=topn_similar,
             inference=inference

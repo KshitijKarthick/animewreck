@@ -11,7 +11,7 @@ app.mount("/static/js", StaticFiles(directory="dist/js", html=True), name="stati
 app.mount("/static/css", StaticFiles(directory="dist/css", html=True), name="static_css")
 app.add_middleware(CORSMiddleware, allow_origins=['*'])
 
-with open('model_resources/cosine_nary_pairwise_distances_top50.json', 'r') as fp:
+with open('model_resources/anime_with_genre_cosine_nary_pairwise_distances_top50.json', 'r') as fp:
     PAIRWISE_MAPPING = json.load(fp)
 
 with open('model_resources/anime_info.json', 'r') as fp:
@@ -53,8 +53,8 @@ def recommendations(watch_history, specificity:int=50, genre_similarity:bool=Fal
     print(watch_history, specificity, topn)
     columns_interested = ['recommendation_rating', 'target_anime_monotonic_id']
     result = generate_recommendations(
-        previous_watch_history=[int(_['id']) for _ in watch_history][:5],
-        previous_watch_ratings=[int(_['rating']) for _ in watch_history][:5],
+        previous_watch_history=[int(_['id']) for _ in watch_history][:10],
+        previous_watch_ratings=[int(_['rating']) for _ in watch_history][:10],
         topn=topn,
         topn_similar=specificity,
         inference=inference,
