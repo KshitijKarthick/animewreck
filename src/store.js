@@ -17,7 +17,7 @@ let store = {
 };
 
 store.setData("serverRoutesConfig", {
-  base: "http://localhost:9000",
+  base: "",
   neighbors: "/api/anime/neighbors",
   recommendations: "/api/anime/recommendations",
   titles: "/api/anime/titles"

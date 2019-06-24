@@ -19,7 +19,7 @@ logger.addHandler(handler_fp)
 app = FastAPI()
 app.mount("/static/js", StaticFiles(directory="dist/js", html=True), name="static_js")
 app.mount("/static/css", StaticFiles(directory="dist/css", html=True), name="static_css")
-app.add_middleware(CORSMiddleware, allow_origins=['*'])
+# app.add_middleware(CORSMiddleware, allow_origins=['*'])
 
 with open('model_resources/anime_with_genre_cosine_nary_pairwise_distances_top50.json', 'r') as fp:
     logger.info('Loading graph similarity nodes.')
@@ -47,7 +47,7 @@ def render_ico():
     return FileResponse('dist/favicon.ico')
 
 @app.get("/api/status")
-def render_homepage():
+def render_status():
     return {'msg': 'Ok'}
 
 @app.get("/api/anime/titles")
@@ -55,7 +55,7 @@ def titles():
     return ANIME_INFO
 
 @app.get("/api/anime/neighbors/{anime_id}")
-def render_homepage(anime_id: int):
+def render_neighbours(anime_id: int):
     return PAIRWISE_MAPPING[str(anime_id)]
 
 @app.get("/api/anime/recommendations")
