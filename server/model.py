@@ -21,13 +21,15 @@ from scipy.spatial.distance import cosine
 np.random.seed(42)
 batch_size = 512
 num_users, num_anime = (108711, 6668)
-past_anime_length = 5
+past_anime_length = 10
 encoded_values_for_rating = 11
 genre_embedding_size=20
 num_genres=44
+min_slice = 6
+max_slice = 11
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-sliced_user_grouped_rating_file = 'model_resources/ordered_sliced_user_grouped_rating_len5_rep3_small.pkl'
+sliced_user_grouped_rating_file = 'model_resources/ordered_sliced_user_grouped_rating_minlen5_maxlen10_rep6_small.pkl'
 grouped_rating_df = pd.read_pickle(sliced_user_grouped_rating_file)
 shuffled_ratings_genre_df = grouped_rating_df.sample(frac=1)
 msk = np.random.rand(len(shuffled_ratings_genre_df)) < 0.8
@@ -35,25 +37,11 @@ train_df = shuffled_ratings_genre_df[msk]
 test_df = shuffled_ratings_genre_df[~msk]
 
 anime_df = pd.read_feather('model_resources/animes.feather').set_index('anime_monotonic_id')
-anime_embeddings = torch.from_numpy(torch.load('model_resources/anime_embeddings.torch'))
 
-# from sklearn.preprocessing import MultiLabelBinarizer
-# anime_genres_df = anime_df.copy()[['genre']]
-# anime_genres_df['genre_split'] = anime_genres_df['genre'].str.split(',').apply(lambda x: [_.strip() for _ in x] if x else [])
-# mb = MultiLabelBinarizer()
-# genres_encoded = mb.fit_transform(anime_genres_df['genre_split'].values)
-
-# mapped_genres = np.apply_along_axis(lambda x: np.ma.masked_array(
-#     np.arange(len(mb.classes_)),
-#     mask=np.logical_not(x),
-#     fill_value=len(mb.classes_)).filled(), axis=1, arr=genres_encoded)
-
-# anime_genres_df['genre_encoded'] = pd.DataFrame(mapped_genres).values.tolist()
-
-# anime_genres_enc_df = anime_genres_df.reset_index().rename(
-#     columns={'index': 'anime_monotonic_id'})[['anime_monotonic_id', 'genre_encoded']].set_index('anime_monotonic_id')
-# genre_embedding_wts = torch.load('model_resources/genre_embeddings.torch')
 anime_with_genre_embeddings = torch.load('model_resources/anime_with_genre_embeddings.wts')
+anime_with_genre_embeddings['anime_with_genre_embeddings'][0] = 0
+anime_with_genre_embeddings['anime_embeddings'][0] = 0
+anime_embeddings = torch.from_numpy(anime_with_genre_embeddings['anime_with_genre_embeddings']).float()
 
 
 class AnimeRatingsDataset(Dataset):
@@ -222,13 +210,13 @@ class Net(nn.Module):
 
 
 model = Net(
-    anime_embedding_dim=50, anime_embedding_vocab=num_anime,
+    anime_embedding_dim=anime_embeddings.shape[1], anime_embedding_vocab=num_anime,
     lstm_hidden_dim=256, lstm_layers=1, anime_embedding_weights=anime_embeddings,
     bidirectional=True
 )
 model.to(device)
 learn = Learner(data=databunch, model=model, loss_func=nn.MSELoss())
-learn = learn.load('lstm_learner_len5_3rep_{}cyc_{}-{}'.format(8, 1.81, 1.798))
+learn = learn.load('lstm_anime_genre_learner_len_min5_max10_6rep_8cyc_1.785-1.752')
 
 def sort_by_distance(record, anime_monotonic_id_embeddings, reverse=True):
     target_embedding = anime_monotonic_id_embeddings[record['target_anime_monotonic_id']]
@@ -260,26 +248,6 @@ def get_similar_anime_from_watch_history(previous_watch_history, anime_embedding
     return list(itertools.chain(*top_similar_not_watched_animes)), neighbours_inference
 
 
-# def get_genre_embeddings(genre_embeddings_wts):
-#     emb_layer = torch.nn.Embedding.from_pretrained(genre_embeddings_wts)
-#     genre_zeros_mask = torch.zeros(genre_embedding_size).to(device)
-#     genre_ones_mask = torch.ones(genre_embedding_size).to(device)
-#     batch_genres = torch.from_numpy(np.array(anime_genres_enc_df['genre_encoded'].tolist()))
-#     genre_embeddings = emb_layer(batch_genres)
-#     mask = torch.where(
-#         batch_genres.view(-1, num_genres - 1, 1) == num_genres - 1,
-#         genre_zeros_mask,
-#         genre_ones_mask
-#     ).view(-1, num_genres - 1, genre_embedding_size)
-#     masked_genre_embeddings = torch.mul(mask, genre_embeddings)
-#     sum_genre_embeddings = torch.sum(masked_genre_embeddings, dim=1)
-#     #anime embeddings is 6669, this is 6668. We need 0th as empty as it is not used with iloc
-#     return np.concatenate([
-#         np.zeros((1, genre_embedding_size)),
-#         sum_genre_embeddings.cpu().detach().numpy()
-#     ])
-        
-
 def recommendation(
     previous_watch_history, previous_watch_ratings, anime_df, model,
     topn=50, only_similar=False, topn_similar=50,
@@ -288,13 +256,9 @@ def recommendation(
     neighbours_inference = None
     watched_animes = previous_watch_history
     if only_similar:
-        # similarity_embeddings = anime_embeddings
         similarity_embeddings = anime_with_genre_embeddings['anime_embeddings']
         if genre_similarity:
             similarity_embeddings = anime_with_genre_embeddings['anime_with_genre_embeddings']
-            # genre_embeddings = get_genre_embeddings(genre_embedding_wts)
-            # similarity_embeddings = np.concatenate([anime_embeddings, genre_embeddings], axis=1)
-        print("Similarity Embedding size", similarity_embeddings.shape)
         not_watched_similarity_scores, neighbours_inference = get_similar_anime_from_watch_history(
             previous_watch_history, similarity_embeddings, topn=topn_similar,
             inference=inference
@@ -308,14 +272,21 @@ def recommendation(
     user_personalised_test_records = []
 
     for anime_id in not_watched_animes:
-        user_personalised_test_records.append(sort_by_distance({
+        slice_length = len(previous_watch_history) + 1
+        needs_padding = max_slice - slice_length
+        ordered = sort_by_distance({
             'target_rating': 0,
             'target_anime_monotonic_id': anime_id,
             'target_status': None,
             'input_anime_monotonic_id': np.array(previous_watch_history),
             'input_rating': np.array(previous_watch_ratings),
             'input_status': np.array([0 for _ in range(len(previous_watch_ratings))])
-        }, anime_embeddings))
+        }, anime_embeddings)
+        ordered['input_anime_monotonic_id'] = np.concatenate([
+            np.zeros(needs_padding).astype(np.int32), ordered['input_anime_monotonic_id']])
+        ordered['input_rating'] = np.concatenate([np.zeros(needs_padding).astype(np.int32), ordered['input_rating']])
+        ordered['input_status'] = np.concatenate([np.zeros(needs_padding).astype(np.int32), ordered['input_status']])
+        user_personalised_test_records.append(ordered)
 
     user_personalised_predict_df = pd.DataFrame(user_personalised_test_records)
 
@@ -343,7 +314,7 @@ def recommendation(
         how='inner'
     )
 
-    if inference:
+    if inference and only_similar:
         inference_df = pd.merge(
             pd.DataFrame([
                 {'input_anime_monotonic_id': watched, 'target_anime_monotonic_id': not_watched}
@@ -369,13 +340,6 @@ def recommendation(
 
     return result_df.set_index('target_anime_monotonic_id')
 
-
-# recommendation(
-#     previous_watch_history=[3114, 5306, 2384, 5307, 4807],
-#     previous_watch_ratings=[8, 8, 9, 7, 10],
-#     anime_df=anime_df,
-#     model=model
-# )[['title', 'title_english', 'recommendation_rating']].head(10)
 
 generate_recommendations = partial(
     recommendation,
