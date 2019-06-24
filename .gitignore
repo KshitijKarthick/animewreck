@@ -2,6 +2,7 @@
 node_modules
 model_resources
 datasets
+models
 /dist
 
 # local env files
