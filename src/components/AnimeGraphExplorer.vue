@@ -14,7 +14,8 @@ export default {
   name: "anime-graph-explorer",
   data: () => ({
     sharedState: store.state,
-    eventBus: store.eventBus
+    eventBus: store.eventBus,
+    graphData: {}
   }),
   props: {
     graphElement: {
@@ -193,12 +194,14 @@ export default {
             function() {
               console.log("Building Graph Lazily");
               let d3Data = this.convertintoD3Data(this.animeMapping);
+              this.graphData = Object.assign({}, this.graphData, d3Data);
               this.buildGraph(d3Data);
             }.bind(this)
           );
         } else {
           console.log("Building Graph");
           let d3Data = this.convertintoD3Data(this.animeMapping);
+          this.graphData = Object.assign({}, this.graphData, d3Data);
           this.buildGraph(d3Data);
         }
       }

@@ -17,7 +17,7 @@
         align-center
         justify-center
         row
-        v-if="userWatchHistory.length == pastHistoryLength"
+        v-if="userWatchHistory.length >= pastHistoryLength"
       >
         <v-flex mt-3>
           <v-btn color="success" @click="submitUserWatchHistory">
@@ -32,7 +32,7 @@
         </v-flex>
       </v-layout>
       <v-flex>
-        <template v-if="userWatchHistory.length == pastHistoryLength">
+        <template v-if="userWatchHistory.length >= pastHistoryLength">
           <v-card flat color="transparent">
             <v-card-text class="v-card-text">
               <v-slider
