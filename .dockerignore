@@ -1,0 +1,9 @@
+model_resources
+models
+node_modules
+venv
+src
+dist
+public
+datasets
+logs

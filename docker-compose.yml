@@ -1,0 +1,15 @@
+version: '3'
+services:
+  server:
+    build: .
+    image: animewreck
+    ports:
+      - "80:80"
+    volumes:
+      - ./model_resources:/animewreck/model_resources
+      - ./models:/animewreck/models
+      - ./datasets:/animewreck/datasets
+      - ./logs:/animewreck/logs
+      - ./server:/animewreck/server
+      - ./__init__.py:/animewreck/__init__.py
+      - ./dist:/animewreck/dist
