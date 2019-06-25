@@ -20,8 +20,6 @@ handler_fp.setFormatter(formatter)
 logger.addHandler(handler_fp)
 
 app = FastAPI()
-app.mount("/static/js", StaticFiles(directory="dist/js", html=True), name="static_js")
-app.mount("/static/css", StaticFiles(directory="dist/css", html=True), name="static_css")
 
 if DEBUG_MODE:
     app.add_middleware(CORSMiddleware, allow_origins=['*'])
@@ -33,23 +31,6 @@ with open('model_resources/anime_with_genre_cosine_nary_pairwise_distances_top50
 with open('model_resources/anime_info.json', 'r') as fp:
     logger.info('Loading anime information.')
     ANIME_INFO = json.load(fp)
-
-@app.exception_handler(404)
-def validation_exception_handler(request, exc):
-    logging.info('Redirecting')
-    return FileResponse('dist/index.html')
-
-@app.get("/static")
-def render_homepage():
-    return FileResponse('dist/index.html')
-
-@app.get("/static/index.html")
-def render_homepage_abs():
-    return FileResponse('dist/index.html')
-
-@app.get("/static/favicon.ico")
-def render_ico():
-    return FileResponse('dist/favicon.ico')
 
 @app.get("/api/status")
 def render_status():

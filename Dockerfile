@@ -13,4 +13,4 @@ RUN pip install --upgrade pip && \
 
 EXPOSE 80
 WORKDIR /animewreck
-CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "9000"]

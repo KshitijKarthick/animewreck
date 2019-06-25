@@ -1,10 +1,10 @@
 version: '3'
 services:
-  server:
+  app_server:
     build: .
     image: animewreck
     ports:
-      - "80:80"
+      - "9000:9000"
     volumes:
       - ./model_resources:/animewreck/model_resources
       - ./models:/animewreck/models
@@ -13,3 +13,11 @@ services:
       - ./server:/animewreck/server
       - ./__init__.py:/animewreck/__init__.py
       - ./dist:/animewreck/dist
+  http_server:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./server/nginx.conf:/etc/nginx/nginx.conf
+      - ./dist:/usr/share/nginx/html/
+      - ./logs:/usr/share/nginx/logs/
