@@ -27,7 +27,10 @@ export default {
       .get(
         this.sharedState.serverRoutes("neighbors") + "/" + this.targetAnimeId
       )
-      .then(response => (this.animeMapping = response.data));
+      .then(response => (this.animeMapping = response.data))
+      .catch(function(error) {
+        alert("Fatal error occurred, cannot reach server.", error);
+      });
   },
   data: function() {
     return {

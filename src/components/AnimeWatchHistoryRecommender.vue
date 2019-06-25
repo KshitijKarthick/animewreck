@@ -3,7 +3,7 @@
     <v-layout column text-xs-center>
       <v-flex>
         <h1 class="display-1 font-weight-bold mb-3 align-center">
-          Enter {{ pastHistoryLength }} Anime Ratings
+          Enter {{ pastHistoryLength }} - {{ maxHistoryLength }} Anime Ratings
         </h1>
       </v-flex>
       <AnimeWatchHistoryForm :userWatchHistory="userWatchHistory">
@@ -82,6 +82,7 @@ export default {
   data: () => ({
     genreSpecific: true,
     pastHistoryLength: 5,
+    maxHistoryLength: 10,
     sharedState: store.state,
     minSpecificity: 3,
     maxSpecificity: 100,
@@ -122,6 +123,7 @@ export default {
         )
         .catch(function(error) {
           console.log(error);
+          alert("Fatal error occurred, cannot reach server.", error);
         });
       this.$router.push({
         name: "animeHistory",
