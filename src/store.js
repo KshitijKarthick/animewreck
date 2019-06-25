@@ -17,7 +17,7 @@ let store = {
 };
 
 store.setData("serverRoutesConfig", {
-  base: "",
+  base: window.webpackHotUpdate === undefined ? "" : "http://localhost:9000",
   neighbors: "/api/anime/neighbors",
   recommendations: "/api/anime/recommendations",
   titles: "/api/anime/titles"
@@ -31,9 +31,14 @@ store.setData("serverRoutes", function(key) {
   return serverUrl;
 });
 
-axios.get(store.state.serverRoutes("titles")).then(function(response) {
-  store.setData("animeInfo", response.data);
-  store.eventBus.$emit("anime-info-loaded");
-});
+axios
+  .get(store.state.serverRoutes("titles"))
+  .then(function(response) {
+    store.setData("animeInfo", response.data);
+    store.eventBus.$emit("anime-info-loaded");
+  })
+  .catch(function(error) {
+    alert("Fatal error occurred, cannot reach server.", error);
+  });
 
 export default store;

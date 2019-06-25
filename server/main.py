@@ -7,6 +7,9 @@ from starlette.responses import RedirectResponse, FileResponse
 from starlette.middleware.cors import CORSMiddleware
 from server.recommender import generate_recommendations
 
+
+DEBUG_MODE = False
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -19,7 +22,9 @@ logger.addHandler(handler_fp)
 app = FastAPI()
 app.mount("/static/js", StaticFiles(directory="dist/js", html=True), name="static_js")
 app.mount("/static/css", StaticFiles(directory="dist/css", html=True), name="static_css")
-# app.add_middleware(CORSMiddleware, allow_origins=['*'])
+
+if DEBUG_MODE:
+    app.add_middleware(CORSMiddleware, allow_origins=['*'])
 
 with open('model_resources/anime_with_genre_cosine_nary_pairwise_distances_top50.json', 'r') as fp:
     logger.info('Loading graph similarity nodes.')
