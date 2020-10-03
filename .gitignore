@@ -4,6 +4,7 @@ model_resources
 datasets
 models
 /dist
+logs
 
 # local env files
 .env.local
