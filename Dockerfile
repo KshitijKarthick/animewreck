@@ -11,6 +11,6 @@ RUN apt-get update && apt-get install -y \
 RUN pip install --upgrade pip && \
     pip install -r /animewreck/requirements.txt
 
-EXPOSE 80
+EXPOSE 9000
 WORKDIR /animewreck
 CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "9000"]

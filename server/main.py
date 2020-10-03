@@ -13,62 +13,77 @@ DEBUG_MODE = False
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-handler_fp = logging.FileHandler('logs/server.log')
+handler_fp = logging.FileHandler("logs/server.log")
 handler_fp.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 handler_fp.setFormatter(formatter)
 logger.addHandler(handler_fp)
 
 app = FastAPI()
 
 if DEBUG_MODE:
-    app.add_middleware(CORSMiddleware, allow_origins=['*'])
+    app.add_middleware(CORSMiddleware, allow_origins=["*"])
 
-with open('model_resources/anime_with_genre_cosine_nary_pairwise_distances_top50.json', 'r') as fp:
-    logger.info('Loading graph similarity nodes.')
+with open(
+    "model_resources/anime_with_genre_cosine_nary_pairwise_distances_top50.json", "r"
+) as fp:
+    logger.info("Loading graph similarity nodes.")
     PAIRWISE_MAPPING = json.load(fp)
 
-with open('model_resources/anime_info.json', 'r') as fp:
-    logger.info('Loading anime information.')
+with open("model_resources/anime_info.json", "r") as fp:
+    logger.info("Loading anime information.")
     ANIME_INFO = json.load(fp)
+
 
 @app.get("/api/status")
 def render_status():
-    return {'msg': 'Ok'}
+    return {"msg": "Ok"}
+
 
 @app.get("/api/anime/titles")
 def titles():
     return ANIME_INFO
 
+
 @app.get("/api/anime/neighbors/{anime_id}")
 def render_neighbours(anime_id: int):
     return PAIRWISE_MAPPING[str(anime_id)]
 
+
 @app.get("/api/anime/recommendations")
-def recommendations(watch_history, specificity:int=50, genre_similarity:bool=False,
-                    topn:int=50, inference:bool=True):
+def recommendations(
+    watch_history,
+    specificity: int = 50,
+    genre_similarity: bool = False,
+    topn: int = 50,
+    inference: bool = True,
+):
     watch_history = json.loads(watch_history)
-    logger.info({
-        'watch_history': watch_history,
-        'specificity': specificity,
-        'topn': topn
-    })
-    columns_interested = ['recommendation_rating', 'target_anime_monotonic_id']
+    logger.info(
+        {"watch_history": watch_history, "specificity": specificity, "topn": topn}
+    )
+    columns_interested = ["recommendation_rating", "target_anime_monotonic_id"]
     result = generate_recommendations(
-        previous_watch_history=[int(_['id']) for _ in watch_history][:10],
-        previous_watch_ratings=[int(_['rating']) for _ in watch_history][:10],
+        previous_watch_history=[int(_["id"]) for _ in watch_history][:10],
+        previous_watch_ratings=[int(_["rating"]) for _ in watch_history][:10],
         topn=topn,
         topn_similar=specificity,
         inference=inference,
-        genre_similarity=genre_similarity
+        genre_similarity=genre_similarity,
     ).reset_index()
     if inference:
-        columns_interested.extend(['inference_source'])
-    return result.reset_index()[columns_interested].rename(
-        columns={
-            'recommendation_rating': 'rating',
-            'target_anime_monotonic_id': 'id',
-            'inference_source': 'inference_source_ids'
-        }).to_dict(orient='record')
+        columns_interested.extend(["inference_source"])
+    return (
+        result.reset_index()[columns_interested]
+        .rename(
+            columns={
+                "recommendation_rating": "rating",
+                "target_anime_monotonic_id": "id",
+                "inference_source": "inference_source_ids",
+            }
+        )
+        .to_dict(orient="record")
+    )
 
-logger.info('All application resources are loaded')
+
+logger.info("All application resources are loaded")
