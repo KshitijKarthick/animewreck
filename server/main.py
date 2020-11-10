@@ -62,7 +62,7 @@ def recommendations(
     logger.info(
         {"watch_history": watch_history, "specificity": specificity, "topn": topn}
     )
-    columns_interested = ["recommendation_rating", "target_anime_monotonic_id"]
+    columns_interested = ["recommendation_rating", "target_anime_monotonic_id", "mal_id"]
     result = generate_recommendations(
         previous_watch_history=[int(_["id"]) for _ in watch_history][:10],
         previous_watch_ratings=[int(_["rating"]) for _ in watch_history][:10],

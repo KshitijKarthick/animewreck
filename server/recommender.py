@@ -176,8 +176,11 @@ def recommendation(
 
     result_df = pd.merge(
         user_personalised_predict_df,
-        anime_df.reset_index()[["anime_monotonic_id", "title", "title_english"]].rename(
-            columns={"anime_monotonic_id": "target_anime_monotonic_id"}
+        anime_df.reset_index()[["anime_monotonic_id", "title", "title_english", "anime_id"]].rename(
+            columns={
+                "anime_monotonic_id": "target_anime_monotonic_id",
+                "anime_id": "mal_id"
+            }
         ),
         on="target_anime_monotonic_id",
         how="inner",

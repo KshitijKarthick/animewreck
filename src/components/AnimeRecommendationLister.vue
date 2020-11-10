@@ -24,6 +24,15 @@
               <v-btn
                 flat
                 icon
+                :href="'https://myanimelist.net/anime/' + props.item.mal_id"
+              >
+                <v-icon>near_me</v-icon>
+              </v-btn>
+            </td>
+            <td class="text-xs-left">
+              <v-btn
+                flat
+                icon
                 :to="{
                   name: 'anime',
                   params: { targetAnimeId: props.item.id }
@@ -101,12 +110,14 @@ export default {
           { text: "Anime", value: "title" },
           { text: "Rating", value: "rating" },
           { text: "Inference Source", value: "inference_source_title" },
+          { text: "My Animelist", value: "" },
           { text: "Anime Explorer", value: "" }
         ];
       } else {
         return [
           { text: "Anime", value: "title" },
           { text: "Rating", value: "rating" },
+          { text: "My Animelist", value: "" },
           { text: "Anime Explorer", value: "" }
         ];
       }
