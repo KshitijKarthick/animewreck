@@ -1,23 +1,23 @@
 version: '3'
 services:
   app_server:
-    build: .
+    build: ./services/backend/
     image: animewreck
     restart: unless-stopped
     volumes:
-      - ./model_resources:/animewreck/model_resources
-      - ./models:/animewreck/models
-      - ./datasets:/animewreck/datasets
+      - ./services/backend/model_resources:/animewreck/model_resources
+      - ./services/backend/models:/animewreck/models
+      - ./services/backend/datasets:/animewreck/datasets
       - ./logs:/animewreck/logs
-      - ./server:/animewreck/server
-      - ./__init__.py:/animewreck/__init__.py
-      - ./dist:/animewreck/dist
+      - ./services/backend/src:/animewreck/src
+      - ./services/backend/__init__.py:/animewreck/__init__.py
+      - ./services/frontend/dist:/animewreck/dist
   http_server:
     image: nginx
     restart: unless-stopped
     ports:
       - "80:80"
     volumes:
-      - ./server/nginx.conf:/etc/nginx/nginx.conf
-      - ./dist:/usr/share/nginx/html/
+      - ./services/web_server/nginx.conf:/etc/nginx/nginx.conf
+      - ./services/frontend/dist:/usr/share/nginx/html/
       - ./logs:/usr/share/nginx/logs/

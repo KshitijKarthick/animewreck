@@ -1,6 +1,7 @@
 import torch
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cpu") # For pure recommendation
 random_seed = 42
 
 num_genres = 44

@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "animewreck"
+version = "0.1.0"
+description = "An Anime Recommendation Engine"
+authors = ["Kshitij Karthick <kshitij.karthick@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.7.*"
+fastai = "1.0.53.post2"
+nvidia-ml-py3 = "7.352.0"
+torch = "1.1.0"
+torchvision = "0.3.0"
+pyarrow = "0.13.0"
+numpy = "1.16.4"
+pandas = "0.24.2"
+scikit-learn = "0.21.2"
+scipy = "1.3.0"
+fastapi = "^0.29.1"
+uvicorn = "^0.11.7"
+uvloop = "^0.14.0"
+beautifulsoup4 = "4.7.1"
+aiofiles = "^23.1.0"
+email-validator = "^2.0.0.post2"
+pytz = "^2023.3"
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^7.5.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

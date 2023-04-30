@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from starlette.staticfiles import StaticFiles
 from starlette.responses import RedirectResponse, FileResponse
 from starlette.middleware.cors import CORSMiddleware
-from server.recommender import generate_recommendations
+from src.recommender import generate_recommendations
 
 
 DEBUG_MODE = False
