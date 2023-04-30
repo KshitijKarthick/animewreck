@@ -1,10 +1,11 @@
 .DS_Store
-services/frontend/node_modules
+
+logs
 services/backend/model_resources
 services/backend/datasets
 services/backend/models
+services/frontend/node_modules
 services/frontend//dist
-logs
 
 # local env files
 .env.local
