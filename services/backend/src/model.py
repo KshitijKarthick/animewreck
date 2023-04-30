@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 from fastai.basic_train import Learner
 
-from server.constants import (
+from src.constants import (
     lstm_hidden_dim,
     lstm_layers,
     bidirectional,

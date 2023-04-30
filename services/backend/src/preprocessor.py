@@ -2,7 +2,7 @@ from torch.utils.data import Dataset, random_split
 
 from fastai.collab import *
 from fastai.tabular import *
-from server.constants import (
+from src.constants import (
     train_frac,
     encoded_values_for_rating,
     past_anime_length,

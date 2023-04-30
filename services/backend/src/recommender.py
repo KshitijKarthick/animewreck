@@ -15,9 +15,9 @@ from fastai.collab import *
 from fastai.tabular import *
 
 from scipy.spatial.distance import cosine
-from server.constants import max_slice, min_slice, random_seed, batch_size, device
-from server.model import build_model, build_learner, load_pretrained_embeddings
-from server.preprocessor import AnimeRatingsDataset, load_dataset, build_databunch
+from constants import max_slice, min_slice, random_seed, batch_size, device
+from src.model import build_model, build_learner, load_pretrained_embeddings
+from src.preprocessor import AnimeRatingsDataset, load_dataset, build_databunch
 
 np.random.seed(random_seed)
 
