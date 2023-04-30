@@ -1,9 +1,13 @@
-model_resources
-models
-node_modules
+# Backend
+services/backend/model_resources
+services/backend/models
+services/backend/datasets
+
+# Frontend
+services/frontend/dist
+services/frontend/node_modules
+
+# Common
 venv
-src
-dist
-public
-datasets
 logs
+.git
