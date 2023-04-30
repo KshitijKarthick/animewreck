@@ -1,33 +1,51 @@
-# AnimeWreck
+# AnimeWreck [🔗](http://animewreck.kshitij.cc/)
 An Anime Recommendation Engine, given the past watch history of the user with the ratings. Predicts the anime which the user can choose to watch.
 
-Built by [Tofigh](https://github.com/tofigh-) & [Kshitij Karthick](https://github.com/KshitijKarthick)
+Built by [Kshitij Karthick](https://github.com/KshitijKarthick) & [Tofigh](https://github.com/tofigh-)
 
+[Live project](http://animewreck.kshitij.cc/) is deployed here.
 
 ## Features
 * User can choose to be very specific to the watch history and expect only similar anime's or explore to find more popular ones which might not fall under the same theme or genre too.
 * User can explore the anime embedding space to find other similar anime in a 3d Graph.
 * User can choose to filter initial prospects which is passed to the model to contain genre embeddings or not (only similar anime)
 
-## Deployment
+## Running the project
 
+### Prerequisites
+1. [Docker](https://docs.docker.com/engine/install/)
+2. [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Setup the project
 ```
+cd animewreck
+
 docker-compose up
 ```
 
-## [ Dev ] Serverside- FastAPI & Uvicorn
+## Development
+
+### Prerequisites
+1. Python 3.7
+2. [Poetry](https://python-poetry.org/docs/#installation)
+3. [NodeJs & NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+
+### Serverside- FastAPI & Uvicorn
 
 #### Project Setup
 ```
-pip install -r requirements.txt
+cd animewreck/services/backend
+poetry install
 
-uvicorn server.main:app --reload --port 9000
+poetry run uvicorn src.main:app --reload --port 9000
 ```
 
-## [ Dev ] Clientside - VueJs & Veutify
+### Clientside - VueJs & Veutify
 
 #### Project setup
 ```
+cd animewreck/services/frontend
+
 npm install
 ```
 
