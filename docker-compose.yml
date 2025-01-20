@@ -1,6 +1,8 @@
 version: '3'
 services:
-  app_server:
+  animewreck_app_server:
+    networks:
+      - web
     build: ./services/backend/
     image: animewreck
     restart: unless-stopped
@@ -10,14 +12,25 @@ services:
       - ./services/backend/datasets:/animewreck/datasets
       - ./logs:/animewreck/logs
       - ./services/backend/src:/animewreck/src
-      - ./services/backend/__init__.py:/animewreck/__init__.py
-      - ./services/frontend/dist:/animewreck/dist
-  http_server:
-    image: nginx
-    restart: unless-stopped
+      - ./services/backend/src/__init__.py:/animewreck/__init__.py
+  animewreck_http_server:
+    networks:
+      - web
+    build: ./services/frontend/
+    image: animewreck_frontend_server
     ports:
-      - "80:80"
+      - 9000:80
+    restart: unless-stopped
     volumes:
       - ./services/web_server/nginx.conf:/etc/nginx/nginx.conf
-      - ./services/frontend/dist:/usr/share/nginx/html/
       - ./logs:/usr/share/nginx/logs/
+      - ./services/frontend/dist:/usr/share/nginx/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.http-server-animewreck.rule=Host(`animewreck.kshitijkarthick.me`) || Host(`animewreck.kshitij.cc`)"
+      - "traefik.http.routers.http-server-animewreck.tls=true"
+      - "traefik.http.routers.http-server-animewreck.entrypoints=websecure"
+      - "traefik.http.routers.http-server-animewreck.tls.certresolver=myresolver"
+networks:
+  web:
+    external: true
